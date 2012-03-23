@@ -44,11 +44,11 @@ create table gtfs_location_types (
   description text
 );
 
-insert into gtfs_location_types(location_type, description) 
+insert into gtfs_location_types(location_type, description)
        values (0,'stop');
-insert into gtfs_location_types(location_type, description) 
+insert into gtfs_location_types(location_type, description)
        values (1,'station');
-insert into gtfs_location_types(location_type, description) 
+insert into gtfs_location_types(location_type, description)
        values (2,'station entrance');
 
 
@@ -184,7 +184,7 @@ create table gtfs_fare_rules (
   route_id    text , --REFERENCES gtfs_routes(route_id),
   origin_id   int ,
   destination_id int ,
-  contains_id int 
+  contains_id int
   -- unofficial features
   ,
   service_id text -- REFERENCES gtfs_calendar(service_id) ?
@@ -207,11 +207,12 @@ create table gtfs_trips (
   block_id text,
   shape_id text
   -- unofficial features
-  ,  
+  ,
   trip_short_name text
 );
 
 create table gtfs_stop_times (
+  stop_time_id serial,
   trip_id text , --REFERENCES gtfs_trips(trip_id),
   arrival_time text, -- CHECK (arrival_time LIKE '__:__:__'),
   departure_time text, -- CHECK (departure_time LIKE '__:__:__'),
@@ -228,7 +229,7 @@ create table gtfs_stop_times (
 
   -- the following are not in the spec
   ,
-  arrival_time_seconds int, 
+  arrival_time_seconds int,
   departure_time_seconds int
 
 );
@@ -253,19 +254,30 @@ create table gtfs_frequencies (
 
 -- unofficial tables
 
+create table route_stops (
+  id serial,
+  route_id text,
+  stop_id text
+);
+
+insert into route_stops
+(select distinct stop_id, route_id
+from gtfs_stop_times st join gtfs_trips t
+on st.trip_id  = t.trip_id);
+
 
 create table gtfs_transfer_types (
   transfer_type int PRIMARY KEY,
   description text
 );
 
-insert into gtfs_transfer_types (transfer_type, description) 
+insert into gtfs_transfer_types (transfer_type, description)
        values (0,'Preferred transfer point');
-insert into gtfs_transfer_types (transfer_type, description) 
+insert into gtfs_transfer_types (transfer_type, description)
        values (1,'Designated transfer point');
-insert into gtfs_transfer_types (transfer_type, description) 
+insert into gtfs_transfer_types (transfer_type, description)
        values (2,'Transfer possible with min_transfer_time window');
-insert into gtfs_transfer_types (transfer_type, description) 
+insert into gtfs_transfer_types (transfer_type, description)
        values (3,'Transfers forbidden');
 
 
